@@ -13,33 +13,27 @@ class ViewController: UITableViewController {
 var pepole = [String]()
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-             
-        let url = URL(string: "https://swapi.dev/api/people/?format=json")
-
-               let task = URLSession.shared.dataTask(with: url!, completionHandler: {
-                   data, response, error in
-                   do{
-                       if let jsonResult = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as? NSDictionary{
-                           if let res = jsonResult["results"] as? NSArray{
-                               for result in res{
-                                   let personDic = result as! NSDictionary
-                                   self.pepole.append(personDic["name"]! as! String)
-                               }
-                               DispatchQueue.main.async {
-                                   self.tableView.reloadData()
-                               }
-                           }
-                       }
-                   }catch{
-                       print(error)
-                   }
-                   
-               })
-               
-               task.resume()
-               tableView.dataSource = self
-    }
+            super.viewDidLoad()
+            StarWarsModel.getAllPeople(completionHandler: { // passing what becomes "completionHandler" in the 'getAllPeople' function definition in StarWarsModel.swift
+                data, response, error in
+                    do {
+                        // Try converting the JSON object to "Foundation Types" (NSDictionary, NSArray, NSString, etc.)
+                        if let jsonResult = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as? NSDictionary {
+                            if let results = jsonResult["results"] as? NSArray {
+                                for person in results {
+                                    let personDict = person as! NSDictionary
+                                    self.pepole.append(personDict["name"]! as! String)
+                                }
+                            }
+                        }
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
+                    } catch {
+                        print("Something went wrong")
+                    }
+            })
+        }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }

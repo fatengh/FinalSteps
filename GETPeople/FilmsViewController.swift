@@ -11,9 +11,7 @@ class FilmsViewController: UITableViewController {
     var films = [String]()
     override func viewDidLoad() {
         super.viewDidLoad()
-        let url = URL(string: "https://swapi.dev/api/films/?format=json")
-             
-        let task = URLSession.shared.dataTask(with: url!, completionHandler: {
+        StarWarsModel.getAllFilms(completionHandler:  {
             data, response, error in
             do{
                 if let jsonResult = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as? NSDictionary{
@@ -22,17 +20,16 @@ class FilmsViewController: UITableViewController {
                             let filmsDic = result as! NSDictionary
                             self.films.append(filmsDic["title"]! as! String)
                         }
+                    }
+                    
+                }
                         DispatchQueue.main.async {
                             self.tableView.reloadData()
                         }
-                    }
-                }
             }catch{
-                print(error)
+                print("error")
             }
         })
-        task.resume()
-        tableView.dataSource = self
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
